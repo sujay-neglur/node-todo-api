@@ -9,7 +9,9 @@ todos=[{
     text:'first to do'
 },{
     _id:new ObjectID(),
-    text:'second to do'
+    text:'second to do',
+    completed:true,
+    completedAt:333
 }];
 
 beforeEach((done) => {
@@ -91,5 +93,40 @@ describe('GET /todos/:id', () => {
         .get(`/todos/${new ObjectID().toHexString()}`)
         .expect(404)
         .end(done);
+    });
+});
+
+describe('PATCH /todos/:id', ()=> {
+    it('should update the todo', (done) => {
+       var hexId= todos[0]._id.toHexString();
+       var updateObject={
+        text:'editing first to do',
+        completed:true
+       }
+       request(app)
+       .patch(`/todos/${hexId}`)
+       .send(updateObject)
+       .expect(200)
+       .expect((result) => {
+           expect(result.body.text).toBe(updateObject.text);
+           expect(result.body.completed).toBe(updateObject.completed);
+           expect(result.body.completedAt).toBeA('number');
+       }).end(done);
+
+    });
+
+    it('should toggle the complete attribute', (done) => {
+       var hexId= todos[1]._id.toHexString();
+       var updateObject={
+           completed:false
+       };
+       request(app)
+       .patch(`/todos/${hexId}`)
+       .send(updateObject)
+       .expect(200)
+       .expect(result => {
+           expect(result.body.completed).toBe(updateObject.completed);
+           expect(result.body.completedAt).toNotExist();
+       }).end(done);
     });
 });
