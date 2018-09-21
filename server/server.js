@@ -95,7 +95,8 @@ app.post('/users', (req, res) => {
   });
   
   
-  app.get('/users/me', (request,response) => {
+  app.get('/users/me',authenticate, (request,response) => {
+      console.log(request.user);
     return response.send(request.user);
   });
 
